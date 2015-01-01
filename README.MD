@@ -14,3 +14,12 @@ Needs to become this:
 After this change, owncloud will no longer be able to read the current passwords and will require for you to use the 'forgot password' function.
 ##Installation
 Simply upload these files to where they seem most appropriate.
+###Files include
+####registration.php
+This file does all the heavy lifting. It validates all the input then adds it to the appropriate database and sends an activation email to the user.
+####activate.php
+This file is tasked with changing or removing the quota limit thus *activating* the account.
+####terminate.php
+This is a makeshift form that will let you terminate any user (apart from yourself) by simply entering their username and a secret password
+####pswd.php
+Contains a lot of functions required for the registration process to go smoothly.

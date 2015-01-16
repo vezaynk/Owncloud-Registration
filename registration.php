@@ -7,16 +7,16 @@ p is the user's password.
 */
 //Check if all requred data is set.
 $allow = 1;
-if (isset($_POST['u'])){
+if (!isset($_POST['u'])){
   $allow = 0;
 }
-if (isset($_POST['e'])){
+if (!isset($_POST['e'])){
   $allow = 0;
 }
-if (isset($_POST['r'])){
+if (!isset($_POST['r'])){
   $allow = 0;
 }
-if (isset($_POST['p'])){
+if (!isset($_POST['p'])){
   $allow = 0;
 }
 if ($allow==0){

@@ -1,3 +1,6 @@
+#Polite Warning:
+Do not use! I broke it! Will fix! Eventually!
+
 #Owncloud Registration System
 This is a substitute for a much-needed feature in Own Cloud which devs neglet to implement - the registration system.
 I did a lot and I mean **a lot** of searching to find someone who already made this but to no avail... I had to do it myself.

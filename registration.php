@@ -23,36 +23,27 @@ if ($allow==0){
   //Some data is missing from the request, abord.
   echo "Invalid Request, no further ressources shall be used.";
   die();
-}
-//Mimic mySQL escape function
-function mysql_escape_mimic($inp) { 
-    if(is_array($inp)) 
-        return array_map(__METHOD__, $inp); 
-
-    if(!empty($inp) && is_string($inp)) { 
-        return str_replace(array('\\', "\0", "\n", "\r", "'", '"', "\x1a"), array('\\\\', '\\0', '\\n', '\\r', "\\'", '\\"', '\\Z'), $inp); 
-    } 
-
-    return $inp; 
 } 
+
+//Import pswd.php file, it contains BCRYPT which OwnCloud uses to hash passwords.
+//You don't need to include it if you are running the latest version of PHP.
+require "pswd.php";
+//Require files
+require "config.php";
+require "functions.php";
 //Set user's data while escaping to avoid SQL Injection
 $user_id = mysql_escape_mimic($_POST['u']);
 $user_email = mysql_escape_mimic($_POST['e']);
 $user_real = mysql_escape_mimic($_POST['r']);
 $user_pass = mysql_escape_mimic($_POST['p']);
-//Import pswd.php file, it contains BCRYPT which OwnCloud uses to hash passwords.
-//You don't need to include it if you are running the latest version of PHP.
-require "pswd.php";
 //Hash the user's password
 $user_hash = password_hash($user_pass, PASSWORD_BCRYPT);
 //We are now ready to create the account
 echo "<b>If you get an error please contact us ASAP and include this log.</b><br/>";
 echo "Preparing to register account...<br/>";
-//Define Connection Records
-$servername = "localhost";
-$username = "xxxxx_ownc934";
-$password = "xxxxxx";
-$dbname = "xxxxx_ownc934";
+
+//Set database credentials in config.php
+
 echo "Establishing connection...<br/>";
 //Establish connection with your mySQL server
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -98,34 +89,8 @@ echo "Sending activation link to inbox...";
 $headers = "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 $headers .= "From: noreply@xxxxxx.com";
-mail("admin@xxxxx.com","New User","
-  <h2>A new user has registered</h2><ul><li>Name: $user_real</li><li>Email: $user_email</li><li>Username: $user_id</li></ul><a href='http://xxxxx.com/terminate.php?user=$user_id'>Terminate User?</a>
-  ",$headers);
-    mail("$user_email", "Welcome to our Cloud" ,"<html style='padding:0;
-  margin:0;'><body style='padding:0;
-  margin:0;'><div id='wrapper' style='font-family:Verdana;width:100%;background-color:#fff;text-align:center;'>
-<div id='header' style='font-family:Verdana;width:80%;background-color:#00CDCD;color:white;padding:5px;'>
-  <h2>Welcome to our Cloud!</h2>
-</div>
- <div id='body' style='width: 80%;
-  background-color: #E0EEEE;
-  padding: 5px;'>
-   <h2>What's next?</h2>
-   <p>
-     $user_real, by now you are probably wondering 'What's next?'. After registration you should download and install the client for your system or the app for your smart phone for which you can find the link on the <a href='http://xxxxx.com'>homepage</a>.
-     If you want to manage your account, please login on our website or <a href='http://xxxx.com/index.php'>click here</a>!
-   </p>
-   <h2>Setting up sync client</h2>
-   <p>
-    To syncronise your files, set the host to <i>xxxx.com</i> while login and password are the credentials you would normally login with.
-   </p>
-   <h2>Activate Account</h2>
-   <p>
-     In order to enable your account, please click the link below.<br/><a href='http://xxxxx.com/activate.php?key=". md5($user_id . $user_id) ."&amp;user=$user_id'>Activate now!</a>
-   </p>
-  </div>
- 
-</div></body></html>",$headers);
+
+mail("$sendFrom","New User","$emailHTML",$headers);
 //Emails sent, process complete.
 echo "Sent!<br/>";
 echo "The registration process is now complete. Use the link sent to your inbox to activate your account.<br/>Task complete. Halted.";

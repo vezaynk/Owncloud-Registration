@@ -29,7 +29,7 @@ $emailHTML="<html style='padding:0;
    <h2>What's next?</h2>
    <p>
      $user_real, by now you are probably wondering 'What's next?'. After registration you should download and install the 
-     client for your PC, phone and tablet <a href=''>here</a>.
+     client for your PC, phone and tablet <a href='https://owncloud.org/sync-clients/'>here</a>.
      If you want to manage your account, please login on our website or <a href='$websiteUrl'>click here</a>!
    </p>
    <h2>Setting up sync client</h2>

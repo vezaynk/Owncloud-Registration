@@ -27,9 +27,6 @@ if ($allow==0){
 
 //Import pswd.php file, it contains BCRYPT which OwnCloud uses to hash passwords.
 //You don't need to include it if you are running the latest version of PHP.
-require "pswd.php";
-//Require files
-require "config.php";
 require "functions.php";
 //Set user's data while escaping to avoid SQL Injection
 $user_id = mysql_escape_mimic($_POST['u']);
@@ -37,8 +34,10 @@ $user_email = mysql_escape_mimic($_POST['e']);
 $user_real = mysql_escape_mimic($_POST['r']);
 $user_pass = mysql_escape_mimic($_POST['p']);
 //Hash the user's password
+require "pswd.php";
 $user_hash = password_hash($user_pass, PASSWORD_BCRYPT);
 //We are now ready to create the account
+require "config.php";
 echo "<b>If you get an error please contact us ASAP and include this log.</b><br/>";
 echo "Preparing to register account...<br/>";
 
@@ -46,7 +45,8 @@ echo "Preparing to register account...<br/>";
 
 echo "Establishing connection...<br/>";
 //Establish connection with your mySQL server
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+
 if (!$conn){
   echo "Failed to establish connection. Halted.";
   die();
@@ -57,7 +57,7 @@ if (!$conn){
 echo "Checking records for duplicates...<br/>";
 //Check username
 echo "Checking User ID (username)...<br/>";
-if (mysqli_num_rows(mysqli_query($conn, "SELECT uid from oc_users WHERE uid = '$user_id'")) > 0) {
+if (mysqli_num_rows(mysqli_query($conn, "SELECT uid from ".$prefix."users WHERE uid = '$user_id'")) > 0) {
     echo "User id already exists. Halted.";
     die();
 } else {
@@ -65,34 +65,34 @@ if (mysqli_num_rows(mysqli_query($conn, "SELECT uid from oc_users WHERE uid = '$
 }
 //Check Email
 echo "Checking email address...<br/>";
-if (mysqli_num_rows(mysqli_query($conn, "SELECT configvalue from oc_preferences WHERE configvalue = '$user_email'")) > 0) {
+if (mysqli_num_rows(mysqli_query($conn, "SELECT configvalue from ".$prefix."preferences WHERE configvalue = '$user_email'")) > 0) {
     echo "Email already registered. Halted.";
     die();
 } else {
   echo "Email is not registered. Proceeding...<br/>";
 }
+
 //No duplicates found. Register account.
 echo "Record validation complete!<br/>";
 echo "Registering Account...<br/>";
-$sql = "INSERT INTO `$dbname`.`oc_users` (`uid`, `displayname`, `password`) VALUES ('$user_id', '$user_real', '$user_hash');"; //Create Usable Account
+$sql = "INSERT INTO `$dbname`.`".$prefix."users` (`uid`, `displayname`, `password`) VALUES ('$user_id', '$user_real', '$user_hash');"; //Create Usable Account
 mysqli_query($conn, $sql);
-$sql = "INSERT INTO `$dbname`.`oc_preferences` (`userid`, `appid`, `configkey`, `configvalue`) VALUES ('$user_id', 'settings', 'email', '$user_email');"; //Associate Email with Acccount
+$sql = "INSERT INTO `$dbname`.`".$prefix."preferences` (`userid`, `appid`, `configkey`, `configvalue`) VALUES ('$user_id', 'settings', 'email', '$user_email');"; //Associate Email with Acccount
 mysqli_query($conn, $sql);
 //Delete the next 2 lines if you want the account to be instantly activated.
-$sql = "INSERT INTO `$dbname`.`oc_preferences` (`userid`, `appid`, `configkey`, `configvalue`) VALUES ('$user_id', 'files', 'quota', '0 B');"; //Set quota to 0 B in order to disable account
+$sql = "INSERT INTO `$dbname`.`".$prefix."preferences` (`userid`, `appid`, `configkey`, `configvalue`) VALUES ('$user_id', 'files', 'quota', '0 B');"; //Set quota to 0 B in order to disable account
 mysqli_query($conn, $sql);
 //Account registered
 echo "The account should now be registered. If you have trouble logging in contact us.<br/>";
 //Dispatch 2 email, 1 to activate user's account to the registree's account and another to the admin's with some of their data and the option to terminate the account.
 //The following may need a LOT of modifying.
 echo "Sending activation link to inbox...";
-$headers = "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-$headers .= "From: noreply@xxxxxx.com";
-
-mail("$sendFrom","New User","$emailHTML",$headers);
+mail("$yourEmail","New User","
+  <h2>A new user has registered</h2><ul><li>Name: $user_real</li><li>Email: $user_email</li><li>Username: $user_id</li></ul><a href='$pathToTerminate?user=$user_id'>Terminate User?</a>
+  ",$headers);
+    mail("$user_email", "Welcome to our Cloud" ,"$emailHTML",$headers);
 //Emails sent, process complete.
 echo "Sent!<br/>";
-echo "The registration process is now complete. Use the link sent to your inbox to activate your account.<br/>Task complete. Halted.";
+echo "The registration process is now complete. Use the link sent to your inbox to activate your account.<br/>Task complete. Halted.<br/>OwnCloud Registration Script by Slava Knyazev (<a href='http://twitter.com/viruzx5'>@ViruZX5</a>) via <a href='http://knyz.org'>KNYZ.org</a>";
 die();
 ?>

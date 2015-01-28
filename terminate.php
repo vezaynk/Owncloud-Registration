@@ -11,29 +11,20 @@
 </form>
 
 <?
-//Mess around with it
+//Mess around with it, you'll figure it out.
 if (isset($_POST['user'])&&$_POST['auth']=="xxxx"&&$_POST['user']!="admin"){
 
-$user=$_GET['user'];
+require("config.php");
+
+$user=$_POST['user'];
 
 $sql = "DELETE 
 
-FROM oc_users
+FROM ".$prefix."users
 
 WHERE uid = '$user';";
 
-
-
-$servername = "localhost";
-
-$username = "xxxx_ownc934";
-
-$password = "xxxxxx";
-
-$dbname = "xxxxx_ownc934";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
+$conn = mysqli_connect($servername, $username, $password, $dbname);
 if ($conn->query($sql) === TRUE) {
 
     echo "Terminated User<br/>";
@@ -46,11 +37,9 @@ if ($conn->query($sql) === TRUE) {
 
 $sql = "DELETE 
 
-FROM oc_preferences
+FROM ".$prefix."preferences
 
 WHERE userid = '$user';";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
 if ($conn->query($sql) === TRUE) {
 
     echo "Terminated Records";

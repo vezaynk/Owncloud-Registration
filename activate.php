@@ -8,13 +8,7 @@ $user = $_GET['user'];
 
 if (md5($user . $user)==$key){
 
-$servername = "localhost";
-
-$username = "xxxxx_ownc934";
-
-$password = "xxxxxxx";
-
-$dbname = "xxxxxx_ownc934";
+require("config.php");
 
 
 
@@ -32,7 +26,7 @@ if (!$conn) {
 
 
 //Removes quota limit
-$sql = "REPLACE `$dbname`.`oc_preferences` (`userid`, `appid`, `configkey`, `configvalue`) VALUES ('$user', 'files', 'quota', 'none');";
+$sql = "REPLACE `$dbname`.`".$prefix."preferences` (`userid`, `appid`, `configkey`, `configvalue`) VALUES ('$user', 'files', 'quota', 'none');";
 
 
 
